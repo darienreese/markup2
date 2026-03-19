@@ -155,17 +155,6 @@ class Markup_12y2 { constructor() {
 		}
 		return args
 	}
-	
-	const TIME_STYLES = {
-		__proto__: null,
-		t: {timeStyle: 'short'},
-		T: {timeStyle: 'medium'},
-		d: {dateStyle: 'short'},
-		D: {dateStyle: 'long'},
-		f: {dateStyle: 'long', timeStyle: 'short'},
-		F: {dateStyle: 'full', timeStyle: 'short'},
-		R: "relative",
-	}
 
 	// tree operations //
 	
@@ -518,16 +507,15 @@ class Markup_12y2 { constructor() {
 					OPEN('background_color', {color})
 				} break; case '\\time': {
 					let [time, style="f"] = rargs
-					let options = TIME_STYLES[style] || TIME_STYLES.f
 					let ntime = +time
-					if (Number.isFinite(ntime)) {
+					if (time!="" && Number.isFinite(ntime)) {
 						time = ntime * 1000
 					} else {
 						//time = Date.parse(time)
 						// if (!Number.isFinite(time))
 						time = null
 					}
-					BLOCK('timestamp', {time, options})
+					BLOCK('timestamp', {time, style})
 				} break; case '\\lang': {
 					let [lang=""] = rargs
 					OPEN('language', {lang})

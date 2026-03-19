@@ -417,12 +417,12 @@ imo not the best place to put a settings button.. it reads as a header
 
 🟩 time invalid
 \time[thursday;t]
-🟩 {"type":"ROOT","content":[{"type":"timestamp","args":{"time":null,"options":{"timeStyle":"short"}}}],"prev":"text"}
+🟩 {"type":"ROOT","content":[{"type":"timestamp","args":{"time":null,"style":"t"}}],"prev":"text"}
 
 🟩 time valid
 \time[1700000000;R]
-🟩 {"type":"ROOT","content":[{"type":"timestamp","args":{"time":1700000000000,"options":"relative"}}],"prev":"text"}
+🟩 {"type":"ROOT","content":[{"type":"timestamp","args":{"time":1700000000000,"style":"R"}}],"prev":"text"}
 
 🟩 time body
-\time[1700000000;R]{}
-🟩 {"type":"ROOT","content":[{"type":"timestamp","args":{"time":1700000000000,"options":"relative"}},"{","}"],"prev":"text"}
+\time[1700000000]{}
+🟩 {"type":"ROOT","content":[{"type":"timestamp","args":{"time":1700000000000,"style":"f"}},"{","}"],"prev":"text"}

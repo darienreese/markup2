@@ -41,6 +41,16 @@ class Markup_Render_Dom { constructor() {
 		}
 	}
 	
+	const TIME_STYLES = {
+		__proto__: null,
+		t: {timeStyle: 'short'},
+		T: {timeStyle: 'medium'},
+		d: {dateStyle: 'short'},
+		D: {dateStyle: 'long'},
+		f: {dateStyle: 'long', timeStyle: 'short'},
+		F: {dateStyle: 'full', timeStyle: 'short'},
+		R: "relative",
+	}
 	function time_ago_2(date) {
 		if (!date) return "When?"
 		let t = date.getTime()
@@ -358,10 +368,11 @@ we should create our own fake bullet elements instead.*/
 			return e
 		}.bind(𐀶`<span class='M-background'>`),
 		
-		timestamp: function({time, options}) {
+		timestamp: function({time, style}) {
 			let e = this()
-			let date = new Date(time)
+			let date = new Date(time===null ? NaN : time)
 			let str
+			let options = TIME_STYLES[style] || TIME_STYLES.f
 			if (options==='relative') {
 				str = time_ago_2(date)
 			} else {
