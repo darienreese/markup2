@@ -478,3 +478,9 @@ y12-video > * {
 .M-overline {
 	text-decoration: overline;
 }
+
+/*** timestamp ***/
+.Markup time {
+	text-decoration: dotted underline;
+	cursor: help;
+}

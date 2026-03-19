@@ -41,6 +41,29 @@ class Markup_Render_Dom { constructor() {
 		}
 	}
 	
+	function time_ago_2(date) {
+		if (!date) return "When?"
+		let t = date.getTime()
+		if (t<0 || isNaN(t)) return "Never?"
+		let seconds_away = (t - Date.now()) / 1000
+		let seconds = Math.abs(seconds_away)
+		let desc = [
+			[31536000, 1, "year", "years"],
+			[2592000, 1, "month", "months"],
+			[86400, 1, "day", "days"],
+			[3600, 0, "hour", "hours"],
+			[60, 0, "min", "min"],
+		].find(desc => seconds > desc[0]*0.96)
+		if (!desc)
+			return "Just now"
+		let round = (seconds/desc[0]).toFixed(desc[1]).replace(/[.]0/, "")
+		let units = +round==1 ? desc[2] : desc[3]
+		return `${round} ${units} ${seconds_away<=0 ? "ago" : "from now"}`
+		/*if (seconds <= -0.5)
+		  return " IN THE FUTURE?"
+		  return Math.round(seconds) + " seconds ago"*/
+	}
+	
 	let preview
 	
 	let CREATE = {
@@ -334,6 +357,20 @@ we should create our own fake bullet elements instead.*/
 				e.dataset.bgcolor = color
 			return e
 		}.bind(𐀶`<span class='M-background'>`),
+		
+		timestamp: function({time, options}) {
+			let e = this()
+			let date = new Date(time)
+			let str
+			if (options==='relative') {
+				str = time_ago_2(date)
+			} else {
+				str = date.toLocaleString([], options)
+			}
+			e.title = date.toString()
+			e.textContent = str
+			return e
+		}.bind(𐀶`<time>`),
 		
 		language: function({lang}) {
 			let e = this()

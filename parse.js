@@ -155,6 +155,17 @@ class Markup_12y2 { constructor() {
 		}
 		return args
 	}
+	
+	const TIME_STYLES = {
+		__proto__: null,
+		t: {timeStyle: 'short'},
+		T: {timeStyle: 'medium'},
+		d: {dateStyle: 'short'},
+		D: {dateStyle: 'long'},
+		f: {dateStyle: 'long', timeStyle: 'short'},
+		F: {dateStyle: 'full', timeStyle: 'short'},
+		R: "relative",
+	}
 
 	// tree operations //
 	
@@ -420,9 +431,14 @@ class Markup_12y2 { constructor() {
 			switch (type) {
 			case 'TAG': {
 				read_args()
+				// ready body:
 				if (token==='\\link') {
+					 // optional body, only { type allowed
 					read_body(false)
+				} else if (token==='\\time') {
+					// no body
 				} else {
+					// required body: { or space
 					read_body(true)
 					if (NO_ARGS===rargs && false===body) {
 						NEVERMIND()
@@ -500,6 +516,18 @@ class Markup_12y2 { constructor() {
 					if (!is_color(color))
 						color = null
 					OPEN('background_color', {color})
+				} break; case '\\time': {
+					let [time, style="f"] = rargs
+					let options = TIME_STYLES[style] || TIME_STYLES.f
+					let ntime = +time
+					if (Number.isFinite(ntime)) {
+						time = ntime * 1000
+					} else {
+						//time = Date.parse(time)
+						// if (!Number.isFinite(time))
+						time = null
+					}
+					BLOCK('timestamp', {time, options})
 				} break; case '\\lang': {
 					let [lang=""] = rargs
 					OPEN('language', {lang})
