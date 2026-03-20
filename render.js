@@ -71,16 +71,6 @@ class Markup_Render_Dom { constructor() {
 		return RTF.format(round, desc[2])
 	}
 
-	function time_ago_2(date) {
-		let t = date.getTime()
-		if (t<0 || isNaN(t)) return "Never?"
-		return time_ago_2_base((t - Date.now()) / 1000)
-	}
-
-	function time_ago_2_temporal(date) {
-		return time_ago_2_base(date.since(Temporal.Now.instant()).total({ unit: 'second' }))
-	}
-	
 	let preview
 	
 	let CREATE = {
@@ -379,11 +369,18 @@ we should create our own fake bullet elements instead.*/
 			let e = this()
 			time = time===null ? NaN : time
 			const date = TEMPORAL_SUPPORT ? Temporal.Instant.fromEpochMilliseconds(time) : new Date(time)
-			let str
+			let str = "When?"
 			let options = TIME_STYLES[style] || TIME_STYLES.f
-			if (options==='relative') {
-				if (!date) str = "When?"
-				else str = TEMPORAL_SUPPORT ? time_ago_2_temporal(date) : time_ago_2(date)
+			if (options==='relative' && date) {
+				if (TEMPORAL_SUPPORT) {
+					str = time_ago_2_base(date.since(Temporal.Now.instant()).total({ unit: 'second' }))
+				} else {
+					let t = date.getTime()
+					if (t<0 || isNaN(t)) return "Never?"
+					str = time_ago_2_base((t - Date.now()) / 1000)
+				}
+			} else if (options==='relative') {
+				/* leave str as default "When?" since date isn't set */
 			} else {
 				str = date.toLocaleString([], options)
 			}
