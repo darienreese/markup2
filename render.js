@@ -28,6 +28,10 @@ class Markup_Render_Dom { constructor() {
 		RELATIVE: (href, thing)=> href.replace(/^[/]{0,2}/, "https://"),
 		ERROR: (href, thing)=> "about:blank#"+href,
 	}
+
+	const RTF = new Intl.RelativeTimeFormat("en", {style: "long"})
+
+	const TEMPORAL_SUPPORT = typeof Temporal !== 'undefined'
 	
 	function filter_url(url, thing) {
 		try {
@@ -51,27 +55,32 @@ class Markup_Render_Dom { constructor() {
 		F: {dateStyle: 'full', timeStyle: 'short'},
 		R: "relative",
 	}
+
+	function time_ago_2_base(seconds) {
+		const seconds_abs = Math.abs(seconds)
+		let desc = [
+			[31536000, 1, "year"],
+			[2592000, 1, "month"],
+			[86400, 1, "day"],
+			[3600, 0, "hour"],
+			[60, 0, "min"],
+		].find(desc => seconds_abs > desc[0]*0.96)
+		if (!desc)
+			return "Just now"
+		let round = (seconds/desc[0]).toFixed(desc[1]).replace(/[.]0/, "")
+		return RTF.format(round, desc[2])
+	}
+
 	function time_ago_2(date) {
 		if (!date) return "When?"
 		let t = date.getTime()
 		if (t<0 || isNaN(t)) return "Never?"
-		let seconds_away = (t - Date.now()) / 1000
-		let seconds = Math.abs(seconds_away)
-		let desc = [
-			[31536000, 1, "year", "years"],
-			[2592000, 1, "month", "months"],
-			[86400, 1, "day", "days"],
-			[3600, 0, "hour", "hours"],
-			[60, 0, "min", "min"],
-		].find(desc => seconds > desc[0]*0.96)
-		if (!desc)
-			return "Just now"
-		let round = (seconds/desc[0]).toFixed(desc[1]).replace(/[.]0/, "")
-		let units = +round==1 ? desc[2] : desc[3]
-		return `${round} ${units} ${seconds_away<=0 ? "ago" : "from now"}`
-		/*if (seconds <= -0.5)
-		  return " IN THE FUTURE?"
-		  return Math.round(seconds) + " seconds ago"*/
+		return time_ago_2_base((t - Date.now()) / 1000)
+	}
+
+	function time_ago_2_temporal(date) {
+		if (!date) return "When?"
+		return time_ago_2_base(date.since(Temporal.Now.instant()).total({ unit: 'second' }))
 	}
 	
 	let preview
@@ -370,11 +379,12 @@ we should create our own fake bullet elements instead.*/
 		
 		timestamp: function({time, style}) {
 			let e = this()
-			let date = new Date(time===null ? NaN : time)
+			const timeVal = time===null ? NaN : time
+			const date = TEMPORAL_SUPPORT ? Temporal.Instant.fromEpochMilliseconds(timeVal) : new Date(timeVal)
 			let str
 			let options = TIME_STYLES[style] || TIME_STYLES.f
 			if (options==='relative') {
-				str = time_ago_2(date)
+				str = TEMPORAL_SUPPORT ? time_ago_2_temporal(date) : time_ago_2(date)
 			} else {
 				str = date.toLocaleString([], options)
 			}
