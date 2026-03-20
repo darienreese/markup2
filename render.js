@@ -72,14 +72,12 @@ class Markup_Render_Dom { constructor() {
 	}
 
 	function time_ago_2(date) {
-		if (!date) return "When?"
 		let t = date.getTime()
 		if (t<0 || isNaN(t)) return "Never?"
 		return time_ago_2_base((t - Date.now()) / 1000)
 	}
 
 	function time_ago_2_temporal(date) {
-		if (!date) return "When?"
 		return time_ago_2_base(date.since(Temporal.Now.instant()).total({ unit: 'second' }))
 	}
 	
@@ -384,7 +382,8 @@ we should create our own fake bullet elements instead.*/
 			let str
 			let options = TIME_STYLES[style] || TIME_STYLES.f
 			if (options==='relative') {
-				str = TEMPORAL_SUPPORT ? time_ago_2_temporal(date) : time_ago_2(date)
+				if (!date) str = "When?"
+				else str = TEMPORAL_SUPPORT ? time_ago_2_temporal(date) : time_ago_2(date)
 			} else {
 				str = date.toLocaleString([], options)
 			}
