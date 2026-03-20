@@ -377,8 +377,8 @@ we should create our own fake bullet elements instead.*/
 		
 		timestamp: function({time, style}) {
 			let e = this()
-			const timeVal = time===null ? NaN : time
-			const date = TEMPORAL_SUPPORT ? Temporal.Instant.fromEpochMilliseconds(timeVal) : new Date(timeVal)
+			time = time===null ? NaN : time
+			const date = TEMPORAL_SUPPORT ? Temporal.Instant.fromEpochMilliseconds(time) : new Date(time)
 			let str
 			let options = TIME_STYLES[style] || TIME_STYLES.f
 			if (options==='relative') {
